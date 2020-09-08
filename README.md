@@ -47,7 +47,7 @@ Configuration Steps:
         (config-line)#transport input ssh
         (config-line)#exit
 4. Try to ping and SSH the R1-e2/0 ip addresses from your IDE  (Should work if above steps are correct).
-5: Run the nornir_script.py from your IDE, you can check the output on the screen and the Excel file will be saved in the same folder where the script file is saved.
+5. Run the nornir_script.py from your IDE, you can check the output on the screen and the Excel file will be saved in the same folder where the script file is saved.
 
 you can use below references for further study.
 

@@ -3,7 +3,7 @@ Nornir Project to Connect and extract output based on NAPALM getters and parse o
 
 You can check my article on Linkedin for details on how to set up GNS lab and use this script. https://www.linkedin.com/posts/kjaved_nornir-networkautomation-napalm-activity-6708690032410075136-hqH1
 
-Note: Please check the caveats related to your environment before using any of the below scripts/libraries or configurations in your working environment.
+Note: Please note that below scripts/libraries or configurations are for learning purposes only, do not use them in production environment.
 
 Introduction:
 

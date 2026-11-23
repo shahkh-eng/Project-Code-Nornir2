@@ -1,6 +1,0 @@
-nornir>=3.6.0,<4.0.0
-nornir-napalm>=0.6.0,<1.0.0
-nornir-utils>=0.3.0,<1.0.0
-napalm>=5.2.0,<6.0.0
-openpyxl>=3.1.5,<4.0.0
-python-dotenv>=1.2.4,<2.0.0

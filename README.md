@@ -69,44 +69,20 @@ python -m venv .venv
 
 ```bash
 pip install --upgrade pip
-pip install -r requirements.txt
 ```
 
 ---
 
 ## Configuration
 
-### 1. Configure Credentials (Environment Variables)
-
-Do **not** hardcode passwords in `hosts.yml`, `group.yml`, or `defaults.yml`. Copy `.env.example` to `.env` and update your lab credentials:
-
-**Linux / macOS:**
-```bash
-cp .env.example .env
-```
-
-**Windows (PowerShell):**
-```powershell
-Copy-Item .env.example .env
-```
-
-Edit `.env`:
-```ini
-NORNIR_USERNAME=gnslab
-NORNIR_PASSWORD=cisco
-NORNIR_ENABLE_SECRET=cisco
-```
-
-*(If `.env` is not present and environment variables are not set, `nornir_script.py` will securely prompt you for credentials at runtime.)*
-
-### 2. Review Inventory Files
+### 1. Review Inventory Files
 
 - `config.yml` — Configures Nornir's `SimpleInventory`, `load_credentials` transform function, and multithreaded runner.
 - `hosts.yml` — Defines your target routers (`R1`–`R5`, e.g., `192.168.122.101`–`192.168.122.105`).
 - `group.yml` — Defines shared platform (`ios`) and NAPALM connection options.
 - `defaults.yml` — Defines global defaults (SSH port `22`).
 
-### 3. Lab Router Setup (GNS3 IOS Example)
+### 2. Lab Router Setup (GNS3 IOS Example)
 
 1. Configure your loopback adapter / management bridge in the `192.168.122.0/24` subnet (e.g., `192.168.122.100/24`).
 2. Configure the management interface on `R1`–`R5` (example for `R1`):

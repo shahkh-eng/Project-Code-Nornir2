@@ -21,7 +21,7 @@ Using **Nornir** (a pure-Python automation framework with multithreaded executio
 ## Technology Stack
 
 - **Python:** 3.10+
-- **Automation Framework:** Nornir (`3.6.x`)
+- **Automation Framework:** Nornir (`2.5.x`)
 - **Device Abstraction:** NAPALM (`5.2.x`) & `nornir-napalm` (`0.6.x`)
 - **Reporting:** OpenPyXL (`3.1.x`)
 - **Configuration & Secrets:** YAML inventory + `.env` / environment variables (`python-dotenv`, `nornir-utils`)

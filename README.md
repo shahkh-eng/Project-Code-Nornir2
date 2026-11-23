@@ -140,7 +140,7 @@ Filter to a specific host or enable verbose Nornir output:
 python nornir_script.py --host R1 --verbose
 ```
 
-Non-interactive mode (requires `NORNIR_USERNAME` and `NORNIR_PASSWORD` to be set in environment or `.env`):
+Non-interactive mode:
 
 ```bash
 python nornir_script.py --non-interactive

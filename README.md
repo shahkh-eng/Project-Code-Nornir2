@@ -1,58 +1,206 @@
-# Project-Code-Nornir
-Nornir Project to Connect and extract output based on NAPALM getters and parse output/save in Excel file.
+# Project-Code-Nornir2
 
-You can check my article on Linkedin for details on how to set up GNS lab and use this script. https://www.linkedin.com/posts/kjaved_nornir-networkautomation-napalm-activity-6708690032410075136-hqH1
+A Python network automation tool built with **Nornir 3**, **NAPALM**, and **OpenPyXL** to concurrently collect structured device facts, interface status, and IP addressing from Cisco IOS routers and export the parsed results into a formatted multi-sheet Excel workbook (`.xlsx`).
 
-Note: Please note that below scripts/libraries or configurations are for learning purposes only, do not use them in production environment.
+> **Note:** These scripts and lab configurations are intended for learning, testing, and lab validation (such as GNS3 or Cisco DevNet Sandboxes). Review and harden security settings before running in a production environment.
 
-Introduction:
+---
 
-We will be using network automation framework “Nornir”. First we need to understand what is a framework; a framework gives us a basic structure around which we can write our code in a standardized manner. Frameworks are more application specific e.g. flask or django are python frameworks for developing web applications. Similarly we have Nornir to interact with networking devices and writing automation code in python. Automation framework is also important to connect to multiple devices at the same time (concurrently), which greatly reduce response time when it comes to many devices in our inventory.   
+## Use Case
 
-We have other frameworks options like Ansible but Nornir is different in the way that we write our own python code to control the automation. Ansible is written in python but to use it we have to write the instructions in its DSL format (YAML). There are also speed concerns, Nornir is faster when it comes to thousands of devices in our inventory. Nornir provides us an interface that does a lot of heavy lifting for us
+Network engineers frequently need up-to-date inventory and interface documentation across multiple routers. Manually running `show` commands and copying output into spreadsheets is slow and error-prone.
 
+Using **Nornir** (a pure-Python automation framework with multithreaded execution) and **NAPALM** (a vendor-neutral abstraction layer), this project:
+- Connects concurrently to multiple Cisco IOS devices (`R1`–`R5`) over SSH.
+- Executes structured NAPALM getters (`facts`, `interfaces`, `interfaces_ip` by default, or custom getters via CLI).
+- Handles unreachable or failed hosts gracefully without crashing the run.
+- Exports clean, styled tables into an Excel report (`.xlsx`) in the project directory.
 
-Installation:
+---
 
-1: Install and integrate GNS3 GUI/GNS3 VM.
-2: Install venv “python and nornir” on your Linux or MAC environment. In my case I will be using PyCharm (venv “Python + Nornir”) on Windows 10. For communication with the GNS3    Lab setup I installed “Microsoft KM-TEST Loopback adopter”. 
-3 Cisco “IOS” image for Cisco emulated devices in GNS3.
-* Please check the link for details https://www.linkedin.com/pulse/gns3-21-gui-vm-installation-integration-steps-khurram-javed
-4: Install Nornir/Python
-5; Make GNS3 lab as per the topology in the screenshot above.
-6: Copy config.yml file in your IDE
-7: Copy group.yml file in your IDE
-8: Copy hosts.yml file in your IDE
-9: Copy nornir_script.py in your IDE
+## Technology Stack
 
-Configuration Steps:
+- **Python:** 3.10+
+- **Automation Framework:** Nornir (`3.6.x`)
+- **Device Abstraction:** NAPALM (`5.2.x`) & `nornir-napalm` (`0.6.x`)
+- **Reporting:** OpenPyXL (`3.1.x`)
+- **Configuration & Secrets:** YAML inventory + `.env` / environment variables (`python-dotenv`, `nornir-utils`)
 
-1. Configure the Microsoft KM-TEST Loopback adapter with the ip address in “192.168.122.100/24” subnet.
-2. Configure the IP Address on R1-R5 “IOS” Router interfaces connected to “Ether Hub” from the same subnet as the appliance, below is one example from R1
+---
 
-        R1(config)#interface ethernet 2/0
-        R1(config-if)#ip address 192.168.122.101 255.255.255.0
-        R1(config-if)#no shutdown
-3. You have to configure R1-R5 for SSHv2
+## Lab Topology
 
-        (config)#hostname (R1-R5)
-        (config)#ip domain-name python.com
-        (config)#crypto key generate rsa (use 1024 bit)
-        (config)#enable password cisco
-        (config)#username gnslab password cisco
-        (config)#username gnslab privilege 15
-        (config)#ip scp server enable
-        (config)#line vty 0 4
-        (config-line)#login local
-        (config-line)#transport input ssh
-        (config-line)#exit
-4. Try to ping and SSH the R1-e2/0 ip addresses from your IDE  (Should work if above steps are correct).
-5. Run the nornir_script.py from your IDE, you can check the output on the screen and the Excel file will be saved in the same folder where the script file is saved.
+![GNS3 Lab Topology](GNS3%20Lab%20Topology.jpg)
 
-you can use below references for further study.
+---
 
-•	Book “Python network programming conquer all your networking challenges with the powerful python language” by Abhishek Ratan, Eric Chou, Pradeeban Kathiravelu.
-•	https://www.youtube.com/watch?v=w9X-jzTweek
-•	https://nornir.readthedocs.io/en/stable/tutorials/intro/overview.html
-•	https://pynet.twb-tech.com/blog/nornir/intro.html
-•	Book “Network Programmability and Automation: Skills for the Next-Generation Network Engineer” by Jason Edelman, Scott S. Lowe and Matt Oswalt
+## Prerequisites
+
+1. **Python 3.10 or higher** ([Download Python](https://www.python.org/downloads/)).
+2. **Cisco IOS devices** in **GNS3** (or a **Cisco DevNet Sandbox** such as the [DevNet Sandbox Catalog](https://devnetsandbox.cisco.com/)) reachable via SSHv2 with SCP enabled.
+   - For Windows + GNS3 communication, configure the **Microsoft KM-TEST Loopback Adapter** (see my [GNS3 GUI/VM Setup Guide](https://www.linkedin.com/pulse/gns3-21-gui-vm-installation-integration-steps-khurram-javed) and [LinkedIn walkthrough](https://www.linkedin.com/posts/kjaved_nornir-networkautomation-napalm-activity-6708690032410075136-hqH1)).
+
+---
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/shahkh-eng/Project-Code-Nornir2.git
+cd Project-Code-Nornir2
+```
+
+### 2. Create and activate a virtual environment
+
+**Linux / macOS:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+**Windows (PowerShell):**
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3. Install dependencies
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+---
+
+## Configuration
+
+### 1. Configure Credentials (Environment Variables)
+
+Do **not** hardcode passwords in `hosts.yml`, `group.yml`, or `defaults.yml`. Copy `.env.example` to `.env` and update your lab credentials:
+
+**Linux / macOS:**
+```bash
+cp .env.example .env
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env`:
+```ini
+NORNIR_USERNAME=gnslab
+NORNIR_PASSWORD=cisco
+NORNIR_ENABLE_SECRET=cisco
+```
+
+*(If `.env` is not present and environment variables are not set, `nornir_script.py` will securely prompt you for credentials at runtime.)*
+
+### 2. Review Inventory Files
+
+- `config.yml` — Configures Nornir's `SimpleInventory`, `load_credentials` transform function, and multithreaded runner.
+- `hosts.yml` — Defines your target routers (`R1`–`R5`, e.g., `192.168.122.101`–`192.168.122.105`).
+- `group.yml` — Defines shared platform (`ios`) and NAPALM connection options.
+- `defaults.yml` — Defines global defaults (SSH port `22`).
+
+### 3. Lab Router Setup (GNS3 IOS Example)
+
+1. Configure your loopback adapter / management bridge in the `192.168.122.0/24` subnet (e.g., `192.168.122.100/24`).
+2. Configure the management interface on `R1`–`R5` (example for `R1`):
+
+```ios
+R1(config)# interface ethernet 2/0
+R1(config-if)# ip address 192.168.122.101 255.255.255.0
+R1(config-if)# no shutdown
+```
+
+3. Enable SSHv2 and SCP (required by NAPALM IOS driver) on `R1`–`R5`:
+
+```ios
+hostname R1
+ip domain-name python.com
+crypto key generate rsa modulus 1024
+enable secret cisco
+username gnslab privilege 15 secret cisco
+ip scp server enable
+line vty 0 4
+ login local
+ transport input ssh
+exit
+```
+
+4. Verify connectivity by pinging and SSHing to `192.168.122.101` from your terminal before running the script.
+
+---
+
+## Usage
+
+Run the script with default settings (`facts`, `interfaces`, `interfaces_ip`):
+
+```bash
+python nornir_script.py
+```
+
+View all available CLI options:
+
+```bash
+python nornir_script.py --help
+```
+
+### Examples
+
+Specify a custom Excel output filename and NAPALM getters:
+
+```bash
+python nornir_script.py --getters facts interfaces interfaces_ip --output network_inventory.xlsx
+```
+
+Filter to a specific host or enable verbose Nornir output:
+
+```bash
+python nornir_script.py --host R1 --verbose
+```
+
+Non-interactive mode (requires `NORNIR_USERNAME` and `NORNIR_PASSWORD` to be set in environment or `.env`):
+
+```bash
+python nornir_script.py --non-interactive
+```
+
+---
+
+## Output
+
+The script displays task execution results in the console and saves an Excel workbook (default: `nornir_napalm_report_<timestamp>.xlsx`) containing:
+- **Summary:** Host reachability, vendor, model, OS version, serial number, uptime, and any error details.
+- **Interfaces:** Interface status (`enabled` / `is_up`), MAC address, speed, MTU, and descriptions.
+- **Interfaces_IP:** Layer 3 IPv4/IPv6 addresses and prefix lengths per interface.
+- **Extra_Getters:** JSON-formatted output if additional getters (e.g., `arp_table`, `bgp_neighbors`) are requested.
+
+---
+
+## Known Issues & Troubleshooting
+
+- **SSH Legacy Algorithms on Older IOS Images:** If connecting to older GNS3 Cisco IOS images fails with Paramiko key-exchange errors, check your host SSH client settings or adjust `optional_args` in `group.yml`.
+- **SCP Required:** NAPALM uses SCP for certain Cisco IOS operations; ensure `ip scp server enable` is configured on each router.
+
+---
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## References
+
+- [Nornir Documentation](https://nornir.readthedocs.io/en/stable/)
+- [NAPALM Documentation](https://napalm.readthedocs.io/en/latest/)
+- [Cisco DevNet Sandbox](https://devnetsandbox.cisco.com/)
+- Book: *Python Network Programming* by Abhishek Ratan, Eric Chou, Pradeeban Kathiravelu
+- Book: *Network Programmability and Automation* by Jason Edelman, Scott S. Lowe, and Matt Oswalt
+- [Nornir Tutorial — Kirk Byers](https://pynet.twb-tech.com/blog/nornir/intro.html)
+- [Nornir Video Overview](https://www.youtube.com/watch?v=w9X-jzTweek)
